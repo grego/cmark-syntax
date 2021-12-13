@@ -1,0 +1,16 @@
+<pre><code class="language-rust"><b>use</b> <var>pulldown_cmark</var><u>::</u>{<var>html</var>, <var>Parser</var>};
+<b>use</b> <var>cmark_syntax</var><u>::</u><em>SyntaxPreprocessor</em>;
+
+<i>// Test highlighting rust code</i>
+<u>#[test]</u>
+<b>fn</b> <var>rust_highlight</var>() {
+    <b>static</b> <var>RUST_CODE</var><u>:</u> <u>&amp;</u><em>str</em> <u>=</u> <var>concat!</var>(<span>&quot;```rust\n&quot;</span>, <var>include_str!</var>(<span>&quot;rust.rs&quot;</span>), <span>&quot;```&quot;</span>);
+    <b>let</b> <var>parser</var> <u>=</u> <var>Parser</var><u>::</u><em>new</em>(<var>RUST_CODE</var>);
+    <b>let</b> <var>processed</var> <u>=</u> <var>SyntaxPreprocessor</var><u>::</u><em>new</em>(<var>parser</var>);
+    
+    <b>let</b> <b>mut</b> <var>rendered</var> <u>=</u> <var>String</var><u>::</u><em>new</em>();
+    <var>html</var><u>::</u><em>push_html</em>(<u>&amp;mut </u><em>rendered</em>, <var>processed</var>);
+    <i>// let _ = std::fs::write(&quot;rust.html&quot;, &amp;rendered);</i>
+    <var>assert_eq!</var>(<var>rendered</var>, <var>include_str!</var>(<span>&quot;rust.html&quot;</span>));
+}
+</code></pre>
