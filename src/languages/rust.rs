@@ -6,8 +6,12 @@ pub enum Rust {
     #[error]
     Error,
 
-    #[regex("[a-zA-Z_$][a-zA-Z0-9_]*!?")]
+    #[regex("[a-z_$][a-zA-Z0-9_]*!?")]
+    #[regex("[A-Z_]*!?", priority = 3)]
     Identifier,
+
+    #[regex("[A-Z][a-zA-Z0-9_]*!?")]
+    StrongIdentifier,
 
     #[regex("\"([^\"\\n]|\\\\[\"\\n])*\"")]
     #[regex("'[^'\\n]*'")]
@@ -34,13 +38,13 @@ pub enum Rust {
 
     #[regex("as|break|const|continue|crate|dyn|else|extern")]
     #[regex("false|for|if|impl|in|let|loop|match|mod|move|mut")]
-    #[regex("pub|ref|return|self|Self|static|super|trait")]
-    #[regex("true|type|unsafe|use|where|while")]
+    #[regex("pub|ref|return|self|Self|static|super")]
+    #[regex("true|unsafe|use|where|while")]
     #[regex("abstract|async|await|become|box|do|final|macro")]
     #[regex("override|priv|try|typeof|unsized|virtual|yield")]
     Keyword,
 
-    #[regex("fn|enum|struct")]
+    #[regex("fn|enum|struct|type|trait")]
     KeywordCtx,
 
     #[regex("Some|None|Ok|Err|str|bool|[ui](8|16|32|64|size)|f32|f64")]
@@ -57,10 +61,13 @@ impl Highlight for Rust {
         use Rust::*;
 
         match tokens {
-            [KeywordCtx, Identifier] | [GlyphCtx, Identifier] | [_, Special] => {
-                Kind::SpecialIdentifier
-            }
+            [KeywordCtx, StrongIdentifier]
+            | [GlyphCtx, StrongIdentifier]
+            | [KeywordCtx, Identifier]
+            | [GlyphCtx, Identifier]
+            | [_, Special] => Kind::SpecialIdentifier,
             [_, Identifier] => Kind::Identifier,
+            [_, StrongIdentifier] => Kind::StrongIdentifier,
             [_, Literal] => Kind::Literal,
             [_, Glyph] | [_, GlyphCtx] => Kind::Glyph,
             [_, Keyword] | [_, KeywordCtx] => Kind::Keyword,

@@ -33,19 +33,22 @@ pub enum Kind {
     Identifier,
     /// Rendered among `em` tags.
     SpecialIdentifier,
+    /// Rendered among `strong` tags.
+    StrongIdentifier,
     /// Rendered among `b` tags.
     Keyword,
     /// Rendered among `i` tags.
     Comment,
 }
 
-static HIGHLIGHT_TAG: [Option<&'static str>; 7] = {
-    let mut tags = [None; 7];
+static HIGHLIGHT_TAG: [Option<&'static str>; 8] = {
+    let mut tags = [None; 8];
 
     tags[Kind::Glyph as usize] = Some("u");
     tags[Kind::Literal as usize] = Some("span");
     tags[Kind::Identifier as usize] = Some("var");
     tags[Kind::SpecialIdentifier as usize] = Some("em");
+    tags[Kind::StrongIdentifier as usize] = Some("strong");
     tags[Kind::Keyword as usize] = Some("b");
     tags[Kind::Comment as usize] = Some("i");
 
@@ -152,7 +155,9 @@ where
     let mut tokens = [Token::ERROR; 2];
 
     while let Some(token) = lex.next() {
-        tokens[0] = tokens[1];
+        if tokens[1] != Token::ERROR {
+            tokens[0] = tokens[1];
+        }
         tokens[1] = token;
 
         let kind = Token::kind(&tokens);

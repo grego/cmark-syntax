@@ -1,5 +1,5 @@
-<pre><code class="language-rust"><b>use</b> <var>std</var><u>::</u><em>io</em><u>::</u>{<var>stdout</var>, <var>Result</var>, <var>Write</var>};
-<b>fn</b> <var>main</var>() <u>-&gt;</u> <var>Result</var><u>&lt;</u>()<u>&gt;</u> {
+<pre><code class="language-rust"><b>use</b> <var>std</var><u>::</u><em>io</em><u>::</u>{<em>stdout</em>, <strong>Result</strong>, <strong>Write</strong>};
+<b>fn</b> <em>main</em>() <u>-&gt;</u> <strong>Result</strong><u>&lt;</u>()<u>&gt;</u> {
     <b>let</b> (<var>s</var>, <var>e</var>) <u>=</u> (<span>br#&quot;use std::io::{stdout, Result, Write};
 fn main() -&gt; Result&lt;()&gt; {
     let (s, e) = (br#&quot;&quot;#</span>, <span>br#&quot;#);
@@ -9,6 +9,6 @@ fn main() -&gt; Result&lt;()&gt; {
 }&quot;#</span>);
     <b>let</b> <var>start</var> <u>=</u> <var>s</var><u>.</u><em>iter</em>()<u>.</u><em>chain</em>(<var>s</var>)<u>.</u><em>chain</em>(<u>&amp;</u>[<span>b'&quot;'</span>,<span>b'#'</span>])<u>.</u><em>chain</em>(<span>b&quot;, br#\&quot;&quot;</span>);
     <b>let</b> <var>end</var> <u>=</u> <var>e</var><u>.</u><em>iter</em>()<u>.</u><em>chain</em>(<span>b&quot;\&quot;&quot;</span>)<u>.</u><em>chain</em>(<var>e</var>)<u>.</u><em>chain</em>(<span>b&quot;\n&quot;</span>);
-    <var>stdout</var>()<u>.</u><em>write_all</em>(<u>&amp;</u><em>start</em><u>.</u><em>chain</em>(<var>end</var>)<u>.</u><em>copied</em>()<u>.</u><em>collect</em><u>::&lt;</u><var>Vec</var><u>&lt;_&gt;&gt;</u>())
+    <var>stdout</var>()<u>.</u><em>write_all</em>(<u>&amp;</u><em>start</em><u>.</u><em>chain</em>(<var>end</var>)<u>.</u><em>copied</em>()<u>.</u><em>collect</em><u>::&lt;</u><strong>Vec</strong><u>&lt;</u><var>_</var><u>&gt;&gt;</u>())
 }
 </code></pre>
