@@ -1,0 +1,13 @@
+use std::io::{stdout, Result, Write};
+fn main() -> Result<()> {
+    let (s, e) = (br#"use std::io::{stdout, Result, Write};
+fn main() -> Result<()> {
+    let (s, e) = (br#""#, br#"#);
+    let start = s.iter().chain(s).chain(&[b'"',b'#']).chain(b", br#\"");
+    let end = e.iter().chain(b"\"").chain(e).chain(b"\n");
+    stdout().write_all(&start.chain(end).copied().collect::<Vec<_>>())
+}"#);
+    let start = s.iter().chain(s).chain(&[b'"',b'#']).chain(b", br#\"");
+    let end = e.iter().chain(b"\"").chain(e).chain(b"\n");
+    stdout().write_all(&start.chain(end).copied().collect::<Vec<_>>())
+}
