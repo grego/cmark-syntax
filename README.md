@@ -17,6 +17,11 @@ The syntax is defined using regexes, which the [Logos](https://docs.rs/logos) pr
 macro turns into a parser on compile time.
 PRs implementing new languages are very welcome!
 
+## Features
+With `latex2mathml` feature enabled, blocks denoted by `math` containing LaTeX formulas
+are rendered into [MathML](https://developer.mozilla.org/docs/Web/MathML) in iniline mode
+and analogously for blocks denoted by `mathblock`, in block mode.
+
 ## Use
 This preprocessor can be used as a callback for the [Ramhorns](https://docs.rs/ramhorns)
 templating engine.

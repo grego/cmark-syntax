@@ -68,33 +68,47 @@ impl<'a, I: Iterator<Item = Event<'a>>> SyntaxPreprocessor<'a, I> {
 impl<'a, I: Iterator<Item = Event<'a>>> Iterator for SyntaxPreprocessor<'a, I> {
     type Item = Event<'a>;
 
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         let lang = match self.parent.next()? {
             Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced(lang))) => lang,
             other => return Some(other),
         };
 
-        let mut code = String::new();
+        let next_events = (self.parent.next(), self.parent.next());
+        let code = if let (Some(Event::Text(ref code)), Some(Event::End(Tag::CodeBlock(_)))) =
+            next_events
+        {
+            code
+        } else {
+            return Some(Event::Text(format!("Unexpected events {:#?}", next_events).into()));
+        };
 
-        for event in &mut self.parent {
-            match event {
-                Event::Text(text) => code.push_str(&text),
-                Event::End(Tag::CodeBlock(CodeBlockKind::Fenced(ref l))) if *l == lang => break,
-                other => println!("Unexpected event {:#?}", other),
-            }
+        #[cfg(feature = "latex2mathml")]
+        if lang.as_ref() == "math" {
+            return Some(Event::Html(
+                latex2mathml::latex_to_mathml(code, latex2mathml::DisplayStyle::Inline)
+                    .unwrap_or_else(|e| e.to_string())
+                    .into(),
+            ));
+        } else if lang.as_ref() == "mathblock" {
+            return Some(Event::Html(
+                latex2mathml::latex_to_mathml(code, latex2mathml::DisplayStyle::Block)
+                    .unwrap_or_else(|e| e.to_string())
+                    .into(),
+            ));
         }
 
         let mut html = String::with_capacity(code.len() + code.len() / 4 + 60);
-
         html.push_str("<pre><code class=\"language-");
         html.push_str(lang.as_ref());
         html.push_str("\">");
 
         match lang.as_ref() {
-            "rust" => highlight::<languages::Rust>(&code, &mut html),
-            "js" | "javascript" => highlight::<languages::JavaScript>(&code, &mut html),
-            "toml" => highlight::<languages::Toml>(&code, &mut html),
-            _ => write_escaped(&mut html, &code),
+            "rust" => highlight::<languages::Rust>(code, &mut html),
+            "js" | "javascript" => highlight::<languages::JavaScript>(code, &mut html),
+            "toml" => highlight::<languages::Toml>(code, &mut html),
+            _ => write_escaped(&mut html, code),
         }
 
         html.push_str("</code></pre>");
@@ -126,9 +140,10 @@ fn write_escaped(s: &mut String, part: &str) {
 }
 
 /// Highlight the code in `source`, placing the output into `buf`.
+#[inline]
 pub fn highlight<'a, Token>(source: &'a str, buf: &mut String)
 where
-    Token: Highlight + Logos<'a, Source=str> + Eq + Copy + std::fmt::Debug,
+    Token: Highlight + Logos<'a, Source = str> + Eq + Copy,
     Token::Extras: Default,
 {
     let mut lex = Token::lexer(source);
@@ -138,8 +153,7 @@ where
 
     while let Some(token) = lex.next() {
         tokens[0] = tokens[1];
-        tokens[1] = dbg!(token);
-        dbg!(lex.slice());
+        tokens[1] = token;
 
         let kind = Token::kind(&tokens);
 

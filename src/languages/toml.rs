@@ -1,5 +1,5 @@
-use logos::Logos;
 use crate::{Highlight, Kind};
+use logos::Logos;
 
 #[derive(Logos, PartialEq, Eq, Clone, Copy, Debug)]
 pub enum Toml {
@@ -42,13 +42,13 @@ impl Highlight for Toml {
         use Toml::*;
 
         match tokens {
-            [GlyphCtx, Identifier]   => Kind::SpecialIdentifier,
-            [_, Identifier]          => Kind::Identifier,
-            [_, Literal]             => Kind::Literal,
-            [_, GlyphCtx]            => Kind::Glyph,
-            [_, Glyph]            	 => Kind::Glyph,
-            [_, Comment]             => Kind::Comment,
-            _                        => Kind::None,
+            [GlyphCtx, Identifier] => Kind::SpecialIdentifier,
+            [_, Identifier] => Kind::Identifier,
+            [_, Literal] => Kind::Literal,
+            [_, GlyphCtx] => Kind::Glyph,
+            [_, Glyph] => Kind::Glyph,
+            [_, Comment] => Kind::Comment,
+            _ => Kind::None,
         }
     }
 }
