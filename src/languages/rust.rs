@@ -14,11 +14,11 @@ pub enum Rust {
     StrongIdentifier,
 
     #[regex("\"([^\"\\n]|\\\\[\"\\n])*\"")]
-    #[regex("'[^'\\n]*'")]
+    #[regex("'([^']|\\\\[^'\\n \\t]*)'")]
     #[regex("r\"[^\"]*\"")]
     #[regex("r#\"#?([^#]|[^\"]#)*\"#")]
     #[regex("b\"([^\"\\n]|\\\\[\"\\n])*\"")]
-    #[regex("b'[^'\\n]*'")]
+    #[regex("b'([^']|\\\\[^'\\n \\t]*)'")]
     #[regex("br\"[^\"]*\"")]
     #[regex("br#\"#?([^#]|[^\"]#)*\"#")]
     #[regex("[0-9][0-9_]*")]
@@ -27,14 +27,17 @@ pub enum Rust {
     #[regex("0[bB][01_]+")]
     Literal,
 
-    #[regex(r#"\?|!|\^|-|\+|\*|&|/|\\|<|>|=|=>|->|_|#\[[^\]]*\]"#)]
+    #[regex(r#"\?|!|\^|-|\+|\*|&|/|\\|<|>|=|=>|->|_|#\[[^\]]*\]|&"#)]
     Glyph,
 
-    #[regex(
-        r"\.|:|(&|'[a-zA-Z_][a-zA-Z0-9_]*)([ \t\n\r]*mut[ \t\n\r]+)?",
-        priority = 3
-    )]
+    #[regex("\\.|:", priority = 3)]
     GlyphCtx,
+    
+    #[regex("\\{|\\}|\\[|\\]|\\(|\\)")]
+    Bracket,
+
+    #[regex("'[a-zA-Z_][a-zA-Z0-9_]*")]
+    Lifetime,
 
     #[regex("as|break|const|continue|crate|dyn|else|extern")]
     #[regex("false|for|if|impl|in|let|loop|match|mod|move|mut")]
@@ -47,10 +50,11 @@ pub enum Rust {
     #[regex("fn|enum|struct|type|trait")]
     KeywordCtx,
 
-    #[regex("Some|None|Ok|Err|str|bool|[ui](8|16|32|64|size)|f32|f64")]
+    #[regex("str|bool|[ui](8|16|32|64|size)|f32|f64")]
     Special,
 
     #[regex("//[^\n]*")]
+    #[regex("/\\*([^/]|[^*]/)*\\*/")]
     Comment,
 }
 
@@ -62,12 +66,11 @@ impl Highlight for Rust {
 
         match tokens {
             [KeywordCtx, StrongIdentifier]
-            | [GlyphCtx, StrongIdentifier]
             | [KeywordCtx, Identifier]
             | [GlyphCtx, Identifier]
-            | [_, Special] => Kind::SpecialIdentifier,
+            | [_, Lifetime] => Kind::SpecialIdentifier,
             [_, Identifier] => Kind::Identifier,
-            [_, StrongIdentifier] => Kind::StrongIdentifier,
+            [_, StrongIdentifier] | [_, Special] => Kind::StrongIdentifier,
             [_, Literal] => Kind::Literal,
             [_, Glyph] | [_, GlyphCtx] => Kind::Glyph,
             [_, Keyword] | [_, KeywordCtx] => Kind::Keyword,

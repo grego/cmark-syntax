@@ -2,6 +2,11 @@ use cmark_syntax::SyntaxPreprocessor;
 use pulldown_cmark::{html, Parser};
 
 // Test highlighting rust code
+/* Multiline
+ * comment */
+
+struct _Unused<'a>(&'a str);
+
 #[test]
 fn rust_highlight() {
     static RUST_CODE: &str = concat!("```rust\n", include_str!("rust.rs"), "```");

@@ -1,15 +1,20 @@
-<pre><code class="language-rust"><b>use</b> <var>cmark_syntax</var><u>::</u><em>SyntaxPreprocessor</em>;
-<b>use</b> <var>pulldown_cmark</var><u>::</u>{<em>html</em>, <strong>Parser</strong>};
+<pre><code class="language-rust"><b>use</b> <var>cmark_syntax</var><u>::</u><strong>SyntaxPreprocessor</strong>;
+<b>use</b> <var>pulldown_cmark</var><u>::</u>{<var>html</var>, <strong>Parser</strong>};
 
 <i>// Test highlighting rust code</i>
+<i>/* Multiline
+ * comment */</i>
+
+<b>struct</b> <em>_Unused</em><u>&lt;</u><em>'a</em><u>&gt;</u>(<u>&amp;</u><em>'a</em> <strong>str</strong>);
+
 <u>#[test]</u>
 <b>fn</b> <em>rust_highlight</em>() {
-    <b>static</b> <var>RUST_CODE</var><u>:</u> <u>&amp;</u><em>str</em> <u>=</u> <var>concat!</var>(<span>&quot;```rust\n&quot;</span>, <var>include_str!</var>(<span>&quot;rust.rs&quot;</span>), <span>&quot;```&quot;</span>);
+    <b>static</b> <var>RUST_CODE</var><u>:</u> <u>&amp;</u><strong>str</strong> <u>=</u> <var>concat!</var>(<span>&quot;```rust\n&quot;</span>, <var>include_str!</var>(<span>&quot;rust.rs&quot;</span>), <span>&quot;```&quot;</span>);
     <b>let</b> <var>parser</var> <u>=</u> <strong>Parser</strong><u>::</u><em>new</em>(<var>RUST_CODE</var>);
     <b>let</b> <var>processed</var> <u>=</u> <strong>SyntaxPreprocessor</strong><u>::</u><em>new</em>(<var>parser</var>);
 
     <b>let</b> <b>mut</b> <var>rendered</var> <u>=</u> <strong>String</strong><u>::</u><em>new</em>();
-    <var>html</var><u>::</u><em>push_html</em>(<u>&amp;mut </u><em>rendered</em>, <var>processed</var>);
+    <var>html</var><u>::</u><em>push_html</em>(<u>&amp;</u><b>mut</b> <var>rendered</var>, <var>processed</var>);
     <i>// let _ = std::fs::write(&quot;rust.html&quot;, &amp;rendered);</i>
     <var>assert_eq!</var>(<var>rendered</var>, <var>include_str!</var>(<span>&quot;rust.html&quot;</span>));
 }
