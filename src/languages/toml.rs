@@ -9,8 +9,8 @@ pub enum Toml {
     #[regex("[a-zA-Z0-9_-]*")]
     Identifier,
 
-    #[regex(r#""([^"\n\\]|\\[btnfr"\\uU])*""#)]
-    #[regex(r#""""([^"\\]|\\[btnfr"\\uU \n]|"[^"]|""[^"])*""""#)]
+    #[regex(r#""([^"\n]|\\"])*""#)]
+    #[regex(r#""""([^"]|\\"]|"[^"]|""[^"])*""""#)]
     #[regex(r#"'[^'\n]*'"#)]
     #[regex(r#"'''([^']|'[^']|''[^'])*'''"#)]
     #[regex("[+-]?[0-9_]+(.[0-9]+)?")]
@@ -25,7 +25,7 @@ pub enum Toml {
     #[regex("[0-9]+-[0-9]+-[0-9]+[Tt ]?[0-9]+:[0-9]+:[0-9]+(.[0-9]+)?([Zz]|([+-][0-9]+:[0-9]+))?")]
     Literal,
 
-    #[regex("=|\\{|\\}|\\.|\\]")]
+    #[regex("\\{|\\}|\\]")]
     Glyph,
 
     #[regex("\\[")]
@@ -42,7 +42,8 @@ impl Highlight for Toml {
         use Toml::*;
 
         match tokens {
-            [GlyphCtx, Identifier] => Kind::SpecialIdentifier,
+            [GlyphCtx, Identifier] => Kind::StrongIdentifier,
+            [Identifier, Identifier] => Kind::SpecialIdentifier,
             [_, Identifier] => Kind::Identifier,
             [_, Literal] => Kind::Literal,
             [_, GlyphCtx] => Kind::Glyph,
