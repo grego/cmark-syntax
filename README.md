@@ -14,7 +14,7 @@ engine.
 
 Files defining language syntax are located in `src/languages` directory.
 The syntax is defined using regexes, which the [Logos](https://docs.rs/logos) procedural
-macro turns into a parser on compile time.
+macro turns into a lexer at the compile time.
 PRs implementing new languages are very welcome!
 
 ## Features
