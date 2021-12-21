@@ -10,6 +10,7 @@ engine.
 ## Supported languages
 * Rust
 * JavaScript
+* sh shell
 * TOML
 
 Files defining language syntax are located in `src/languages` directory.

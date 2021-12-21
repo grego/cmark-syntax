@@ -108,9 +108,10 @@ impl<'a, I: Iterator<Item = Event<'a>>> Iterator for SyntaxPreprocessor<'a, I> {
         html.push_str("\">");
 
         match lang.as_ref() {
-            "rust" => highlight::<languages::Rust>(code, &mut html),
+            "rust" | "rs" => highlight::<languages::Rust>(code, &mut html),
             "js" | "javascript" => highlight::<languages::JavaScript>(code, &mut html),
             "toml" => highlight::<languages::Toml>(code, &mut html),
+            "sh" | "shell" | "bash" => highlight::<languages::Sh>(code, &mut html),
             _ => write_escaped(&mut html, code),
         }
 
