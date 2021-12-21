@@ -12,9 +12,12 @@ use pulldown_cmark::{CodeBlockKind, Event, Tag};
 pub mod languages;
 
 /// A type of token that can be highlighted.
-pub trait Highlight: Sized {
+pub trait Highlight: Sized + for<'a> Logos<'a, Source=str> {
     /// Name of the language of this highlighter.
     const LANG: &'static str;
+
+    /// The token denoting the start, before input.
+    const START: Self = Self::ERROR;
 
     /// Determine the kind of a token from the current and the previous token.
     fn kind(tokens: &[Self; 2]) -> Kind;
@@ -84,7 +87,9 @@ impl<'a, I: Iterator<Item = Event<'a>>> Iterator for SyntaxPreprocessor<'a, I> {
         {
             code
         } else {
-            return Some(Event::Text(format!("Unexpected events {:#?}", next_events).into()));
+            return Some(Event::Text(
+                format!("Unexpected events {:#?}", next_events).into(),
+            ));
         };
 
         #[cfg(feature = "latex2mathml")]
@@ -147,13 +152,13 @@ fn write_escaped(s: &mut String, part: &str) {
 #[inline]
 pub fn highlight<'a, Token>(source: &'a str, buf: &mut String)
 where
-    Token: Highlight + Logos<'a, Source = str> + Eq + Copy,
-    Token::Extras: Default,
+    Token: Highlight + Eq + Copy,
+    <Token as Logos<'a>>::Extras: Default,
 {
     let mut lex = Token::lexer(source);
     let mut open = Kind::None;
     let mut last = 0usize;
-    let mut tokens = [Token::ERROR; 2];
+    let mut tokens = [Token::START; 2];
 
     while let Some(token) = lex.next() {
         if tokens[1] != Token::ERROR {

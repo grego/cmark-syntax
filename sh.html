@@ -1,0 +1,26 @@
+<pre><code class="language-sh"><i>#!/bin/bash</i>
+<b>for</b> f <b>in</b> <var>$</var><u>(</u><strong>find</strong> . -maxdepth 2 -name <span>'*.tif'</span> -o -name <span>'*.ppm'</span><u>);</u> <b>do</b>
+    <strong>nf</strong>=<var>${f%.*}</var>.jpg
+    <strong>wf</strong>=<var>${f%.*}</var>.webp
+
+    <strong>convert</strong> <var>$f</var> -resize 2048x pnm:- <u>|</u> <strong>cjpeg</strong> -quality 80 -optimize <u>&gt;</u> <var>${f%/*}</var>/half/<var>${nf##*/}</var>
+    <strong>echo</strong> <var>${f%/*}</var>/half/<var>${nf##*/}</var> created
+
+    <strong>convert</strong> <var>$f</var> -resize 1280x pnm:- <u>|</u> <strong>cjpeg</strong> -quality 80 -optimize <u>&gt;</u> <var>${f%/*}</var>/retina/<var>${nf##*/}</var>
+    <strong>echo</strong> <var>${f%/*}</var>/retina/<var>${nf##*/}</var> created
+
+    <strong>convert</strong> <var>$f</var> -resize 768x pnm:- <u>|</u> <strong>cjpeg</strong> -quality 80 -optimize <u>&gt;</u> <var>${f%/*}</var>/thumb/<var>${nf##*/}</var>
+    <strong>echo</strong> <var>${f%/*}</var>/thumb/<var>${nf##*/}</var> created
+
+    <strong>cwebp</strong> -resize 2048 0 -q 80 -m 6 -mt -hint photo -quiet <var>$f</var> -o <var>${f%/*}</var>/half/<var>${wf##*/}</var>
+    <strong>echo</strong> <var>${f%/*}</var>/half/<var>${wf##*/}</var> created
+    
+    <strong>cwebp</strong> -resize 1280 0 -q 75 -m 6 -mt -hint photo -quiet <var>$f</var> -o <var>${f%/*}</var>/retina/<var>${wf##*/}</var>
+    <strong>echo</strong> <var>${f%/*}</var>/retina/<var>${wf##*/}</var> created
+
+    <strong>cwebp</strong> -resize 768 0 -q 85 -m 6 -mt -hint photo -quiet <var>$f</var> -o <var>${f%/*}</var>/thumb/<var>${wf##*/}</var>
+    <strong>echo</strong> <var>${f%/*}</var>/thumb/<var>${wf##*/}</var> created
+
+    <strong>./rm</strong> <var>$f</var>
+<b>done</b>
+</code></pre>

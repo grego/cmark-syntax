@@ -6,6 +6,8 @@ pub enum Sh {
     #[error]
     Error,
 
+    Start,
+
     #[regex(r"[^\s=$\(\)\{\}]*")]
     Word,
 
@@ -46,12 +48,15 @@ pub enum Sh {
 
 impl Highlight for Sh {
     const LANG: &'static str = "sh";
+    const START: Sh = Self::Start;
 
     fn kind(tokens: &[Self; 2]) -> Kind {
         use Sh::*;
 
         match tokens {
-            [KeywordCtx, Word] | [Glyph, Word] | [Newline, Word] => Kind::StrongIdentifier,
+            [KeywordCtx, Word] | [Glyph, Word] | [Newline, Word] | [Start, Word] => {
+                Kind::StrongIdentifier
+            }
             [_, Parameter] => Kind::Identifier,
             [_, Literal] => Kind::Literal,
             [_, Glyph] => Kind::Glyph,

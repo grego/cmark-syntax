@@ -10,6 +10,6 @@ fn toml_highlight() {
 
     let mut rendered = String::new();
     html::push_html(&mut rendered, processed);
-    //let _ = std::fs::write("sh.html", &rendered);
+    let _ = std::fs::write("sh.html", &rendered);
     assert_eq!(rendered, include_str!("sh.html"));
 }
