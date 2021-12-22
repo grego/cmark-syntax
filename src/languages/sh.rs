@@ -22,6 +22,8 @@ pub enum Sh {
 
     #[token("|")]
     #[token("&")]
+    #[token("||")]
+    #[token("&&")]
     #[token(";")]
     #[token("(")]
     #[token(")")]
