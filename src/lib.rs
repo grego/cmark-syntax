@@ -71,6 +71,13 @@ impl<'a, I: Iterator<Item = Event<'a>>> SyntaxPreprocessor<'a, I> {
     }
 }
 
+#[cfg(feature = "latex2mathml")]
+#[inline]
+fn is_inline_latex(s: &str) -> bool {
+    let s = s.as_bytes();
+    s.len() > 1 && [s[0], s[s.len() - 1]] == [b'$', b'$']
+}
+
 impl<'a, I: Iterator<Item = Event<'a>>> Iterator for SyntaxPreprocessor<'a, I> {
     type Item = Event<'a>;
 
@@ -78,6 +85,14 @@ impl<'a, I: Iterator<Item = Event<'a>>> Iterator for SyntaxPreprocessor<'a, I> {
     fn next(&mut self) -> Option<Self::Item> {
         let lang = match self.parent.next()? {
             Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced(lang))) => lang,
+            #[cfg(feature = "latex2mathml")]
+            Event::Code(c) if is_inline_latex(&c) => {
+                return Some(Event::Html(
+                    latex2mathml::latex_to_mathml(&c[1..c.len() - 1], latex2mathml::DisplayStyle::Inline)
+                        .unwrap_or_else(|e| e.to_string())
+                        .into(),
+                ));
+            }
             other => return Some(other),
         };
 
@@ -94,12 +109,6 @@ impl<'a, I: Iterator<Item = Event<'a>>> Iterator for SyntaxPreprocessor<'a, I> {
 
         #[cfg(feature = "latex2mathml")]
         if lang.as_ref() == "math" {
-            return Some(Event::Html(
-                latex2mathml::latex_to_mathml(code, latex2mathml::DisplayStyle::Inline)
-                    .unwrap_or_else(|e| e.to_string())
-                    .into(),
-            ));
-        } else if lang.as_ref() == "mathblock" {
             return Some(Event::Html(
                 latex2mathml::latex_to_mathml(code, latex2mathml::DisplayStyle::Block)
                     .unwrap_or_else(|e| e.to_string())

@@ -20,8 +20,8 @@ PRs implementing new languages are very welcome!
 
 ## Features
 With `latex2mathml` feature enabled, blocks denoted by `math` containing LaTeX formulas
-are rendered into [MathML](https://developer.mozilla.org/docs/Web/MathML) in iniline mode
-and analogously for blocks denoted by `mathblock`, in block mode.
+are rendered into [MathML](https://developer.mozilla.org/docs/Web/MathML) in block mode
+and analogously for inline code delimited by `$` at the start and the end in inline mode.
 
 ## Use
 This preprocessor can be used as a callback for the [Ramhorns](https://docs.rs/ramhorns)
