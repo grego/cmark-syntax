@@ -1,6 +1,6 @@
 [package]
 name = "cmark-syntax"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 authors = ["Maciej Hirsz <maciej.hirsz@pm.me>", "Maroš Grego <maros@grego.site>"]
 description = "Syntax highlighting for pulldown-cmark"
@@ -12,7 +12,7 @@ license = "GPL-3.0-or-later"
 readme = "README.md"
 
 [dependencies]
-pulldown-cmark = "0.9"
+pulldown-cmark = { version = "0.9", default_features = false }
 logos = "0.12"
 latex2mathml = { version = "0.2.3", optional = true }
 
