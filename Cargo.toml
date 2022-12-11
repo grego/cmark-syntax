@@ -1,6 +1,6 @@
 [package]
 name = "cmark-syntax"
-version = "0.3.1"
+version = "0.4.1"
 edition = "2021"
 authors = ["Maciej Hirsz <maciej.hirsz@pm.me>", "Maroš Grego <maros@grego.site>"]
 description = "Syntax highlighting for pulldown-cmark"

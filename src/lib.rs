@@ -6,13 +6,13 @@
 // along with cmark-syntax.  If not, see <http://www.gnu.org/licenses/>
 #![doc = include_str!("../README.md")]
 use logos::Logos;
-use pulldown_cmark::{CodeBlockKind, Event, Tag};
+use pulldown_cmark::{CodeBlockKind, CowStr, Event, Tag};
 
 /// Definition of syntaxes of various languages.
 pub mod languages;
 
 /// A type of token that can be highlighted.
-pub trait Highlight: Sized + for<'a> Logos<'a, Source=str> {
+pub trait Highlight: Sized + for<'a> Logos<'a, Source = str> {
     /// Name of the language of this highlighter.
     const LANG: &'static str;
 
@@ -84,33 +84,56 @@ impl<'a, I: Iterator<Item = Event<'a>>> Iterator for SyntaxPreprocessor<'a, I> {
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         let lang = match self.parent.next()? {
-            Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced(lang))) => lang,
+            Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced(lang))) if !lang.is_empty() => lang,
             #[cfg(feature = "latex2mathml")]
             Event::Code(c) if is_inline_latex(&c) => {
                 return Some(Event::Html(
-                    latex2mathml::latex_to_mathml(&c[1..c.len() - 1], latex2mathml::DisplayStyle::Inline)
-                        .unwrap_or_else(|e| e.to_string())
-                        .into(),
+                    latex2mathml::latex_to_mathml(
+                        &c[1..c.len() - 1],
+                        latex2mathml::DisplayStyle::Inline,
+                    )
+                    .unwrap_or_else(|e| e.to_string())
+                    .into(),
                 ));
             }
             other => return Some(other),
         };
 
-        let next_events = (self.parent.next(), self.parent.next());
-        let code = if let (Some(Event::Text(ref code)), Some(Event::End(Tag::CodeBlock(_)))) =
-            next_events
-        {
-            code
-        } else {
-            return Some(Event::Text(
-                format!("Unexpected events {:#?}", next_events).into(),
-            ));
+        let next = self.parent.next();
+        let code = match next {
+            Some(Event::Text(c)) => {
+                let mut code = c;
+                loop {
+                    match self.parent.next() {
+                        Some(Event::Text(ref c)) => {
+                            code = {
+                                let mut s = code.into_string();
+                                s.push_str(c);
+                                CowStr::Boxed(s.into())
+                            }
+                        }
+                        Some(Event::End(Tag::CodeBlock(_))) | None => break,
+                        Some(e) => {
+                            return Some(Event::Text(
+                                format!("Unexpected markdown event {:#?}", e).into(),
+                            ))
+                        }
+                    }
+                }
+                code
+            }
+            Some(Event::End(Tag::CodeBlock(_))) | None => CowStr::Borrowed(""),
+            Some(e) => {
+                return Some(Event::Text(
+                    format!("Unexpected markdown event {:#?}", e).into(),
+                ))
+            }
         };
 
         #[cfg(feature = "latex2mathml")]
         if lang.as_ref() == "math" {
             return Some(Event::Html(
-                latex2mathml::latex_to_mathml(code, latex2mathml::DisplayStyle::Block)
+                latex2mathml::latex_to_mathml(&code, latex2mathml::DisplayStyle::Block)
                     .unwrap_or_else(|e| e.to_string())
                     .into(),
             ));
@@ -122,11 +145,11 @@ impl<'a, I: Iterator<Item = Event<'a>>> Iterator for SyntaxPreprocessor<'a, I> {
         html.push_str("\">");
 
         match lang.as_ref() {
-            "rust" | "rs" => highlight::<languages::Rust>(code, &mut html),
-            "js" | "javascript" => highlight::<languages::JavaScript>(code, &mut html),
-            "toml" => highlight::<languages::Toml>(code, &mut html),
-            "sh" | "shell" | "bash" => highlight::<languages::Sh>(code, &mut html),
-            _ => write_escaped(&mut html, code),
+            "rust" | "rs" => highlight::<languages::Rust>(&code, &mut html),
+            "js" | "javascript" => highlight::<languages::JavaScript>(&code, &mut html),
+            "toml" => highlight::<languages::Toml>(&code, &mut html),
+            "sh" | "shell" | "bash" => highlight::<languages::Sh>(&code, &mut html),
+            _ => write_escaped(&mut html, &code),
         }
 
         html.push_str("</code></pre>");
