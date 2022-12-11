@@ -32,7 +32,7 @@ pub enum Rust {
 
     #[regex("\\.|:", priority = 3)]
     GlyphCtx,
-    
+
     #[regex("\\{|\\}|\\[|\\]|\\(|\\)")]
     Bracket,
 
