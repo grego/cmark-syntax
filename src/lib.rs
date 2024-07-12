@@ -44,18 +44,18 @@ pub enum Kind {
     Comment,
 }
 
-static HIGHLIGHT_TAG: [Option<&'static str>; 8] = {
-    let mut tags = [None; 8];
+static HIGHLIGHT_CLASS: [Option<&'static str>; 8] = {
+    let mut classes = [None; 8];
 
-    tags[Kind::Glyph as usize] = Some("u");
-    tags[Kind::Literal as usize] = Some("span");
-    tags[Kind::Identifier as usize] = Some("var");
-    tags[Kind::SpecialIdentifier as usize] = Some("em");
-    tags[Kind::StrongIdentifier as usize] = Some("strong");
-    tags[Kind::Keyword as usize] = Some("b");
-    tags[Kind::Comment as usize] = Some("i");
+    classes[Kind::Glyph as usize] = Some("glyph");
+    classes[Kind::Literal as usize] = Some("literal");
+    classes[Kind::Identifier as usize] = Some("identifier");
+    classes[Kind::SpecialIdentifier as usize] = Some("special-identifier");
+    classes[Kind::StrongIdentifier as usize] = Some("strong-identifier");
+    classes[Kind::Keyword as usize] = Some("keyword");
+    classes[Kind::Comment as usize] = Some("comment");
 
-    tags
+    classes
 };
 
 /// A preprocessor that highlights syntax in `pulldown_cmark` events.
@@ -202,20 +202,18 @@ where
 
         if open != kind {
             // Close previous tag
-            if let Some(tag) = HIGHLIGHT_TAG[open as usize] {
-                buf.push_str("</");
-                buf.push_str(tag);
-                buf.push('>');
+            if open != Kind::None {
+                buf.push_str("</span>");
             }
 
             // Include trivia
             write_escaped(buf, &source[last..lex.span().start]);
 
             // Open new tag
-            if let Some(tag) = HIGHLIGHT_TAG[kind as usize] {
-                buf.push('<');
+            if let Some(tag) = HIGHLIGHT_CLASS[kind as usize] {
+                buf.push_str("<span class=\"");
                 buf.push_str(tag);
-                buf.push('>');
+                buf.push_str("\">");
             }
 
             open = kind;
@@ -230,9 +228,7 @@ where
     }
 
     // Close tail tag
-    if let Some(tag) = HIGHLIGHT_TAG[open as usize] {
-        buf.push_str("</");
-        buf.push_str(tag);
-        buf.push('>');
+    if open != Kind::None {
+        buf.push_str("</span>");
     }
 }

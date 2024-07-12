@@ -1,26 +1,26 @@
-<pre><code class="language-sh"><i>#!/bin/bash</i>
-<b>for</b> f <b>in</b> <var>$</var><u>(</u><strong>find</strong> . -maxdepth 2 -name <span>'*.tif'</span> -o -name <span>'*.ppm'</span><u>);</u> <b>do</b>
-    <strong>nf</strong>=<var>${f%.*}</var>.jpg
-    <strong>wf</strong>=<var>${f%.*}</var>.webp
+<pre><code class="language-sh"><span class="comment">#!/bin/bash</span>
+<span class="keyword">for</span> f <span class="keyword">in</span> <span class="identifier">$</span><span class="glyph">(</span><span class="strong-identifier">find</span> . -maxdepth 2 -name <span class="literal">'*.tif'</span> -o -name <span class="literal">'*.ppm'</span><span class="glyph">);</span> <span class="keyword">do</span>
+    <span class="strong-identifier">nf</span>=<span class="identifier">${f%.*}</span>.jpg
+    <span class="strong-identifier">wf</span>=<span class="identifier">${f%.*}</span>.webp
 
-    <strong>convert</strong> <var>$f</var> -resize 2048x pnm:- <u>|</u> <strong>cjpeg</strong> -quality 80 -optimize <u>&gt;</u> <var>${f%/*}</var>/half/<var>${nf##*/}</var>
-    <strong>echo</strong> <var>${f%/*}</var>/half/<var>${nf##*/}</var> created
+    <span class="strong-identifier">convert</span> <span class="identifier">$f</span> -resize 2048x pnm:- <span class="glyph">|</span> <span class="strong-identifier">cjpeg</span> -quality 80 -optimize <span class="glyph">&gt;</span> <span class="identifier">${f%/*}</span>/half/<span class="identifier">${nf##*/}</span>
+    <span class="strong-identifier">echo</span> <span class="identifier">${f%/*}</span>/half/<span class="identifier">${nf##*/}</span> created
 
-    <strong>convert</strong> <var>$f</var> -resize 1280x pnm:- <u>|</u> <strong>cjpeg</strong> -quality 80 -optimize <u>&gt;</u> <var>${f%/*}</var>/retina/<var>${nf##*/}</var>
-    <strong>echo</strong> <var>${f%/*}</var>/retina/<var>${nf##*/}</var> created
+    <span class="strong-identifier">convert</span> <span class="identifier">$f</span> -resize 1280x pnm:- <span class="glyph">|</span> <span class="strong-identifier">cjpeg</span> -quality 80 -optimize <span class="glyph">&gt;</span> <span class="identifier">${f%/*}</span>/retina/<span class="identifier">${nf##*/}</span>
+    <span class="strong-identifier">echo</span> <span class="identifier">${f%/*}</span>/retina/<span class="identifier">${nf##*/}</span> created
 
-    <strong>convert</strong> <var>$f</var> -resize 768x pnm:- <u>|</u> <strong>cjpeg</strong> -quality 80 -optimize <u>&gt;</u> <var>${f%/*}</var>/thumb/<var>${nf##*/}</var>
-    <strong>echo</strong> <var>${f%/*}</var>/thumb/<var>${nf##*/}</var> created
+    <span class="strong-identifier">convert</span> <span class="identifier">$f</span> -resize 768x pnm:- <span class="glyph">|</span> <span class="strong-identifier">cjpeg</span> -quality 80 -optimize <span class="glyph">&gt;</span> <span class="identifier">${f%/*}</span>/thumb/<span class="identifier">${nf##*/}</span>
+    <span class="strong-identifier">echo</span> <span class="identifier">${f%/*}</span>/thumb/<span class="identifier">${nf##*/}</span> created
 
-    <strong>cwebp</strong> -resize 2048 0 -q 80 -m 6 -mt -hint photo -quiet <var>$f</var> -o <var>${f%/*}</var>/half/<var>${wf##*/}</var>
-    <strong>echo</strong> <var>${f%/*}</var>/half/<var>${wf##*/}</var> created
+    <span class="strong-identifier">cwebp</span> -resize 2048 0 -q 80 -m 6 -mt -hint photo -quiet <span class="identifier">$f</span> -o <span class="identifier">${f%/*}</span>/half/<span class="identifier">${wf##*/}</span>
+    <span class="strong-identifier">echo</span> <span class="identifier">${f%/*}</span>/half/<span class="identifier">${wf##*/}</span> created
     
-    <strong>cwebp</strong> -resize 1280 0 -q 75 -m 6 -mt -hint photo -quiet <var>$f</var> -o <var>${f%/*}</var>/retina/<var>${wf##*/}</var>
-    <strong>echo</strong> <var>${f%/*}</var>/retina/<var>${wf##*/}</var> created
+    <span class="strong-identifier">cwebp</span> -resize 1280 0 -q 75 -m 6 -mt -hint photo -quiet <span class="identifier">$f</span> -o <span class="identifier">${f%/*}</span>/retina/<span class="identifier">${wf##*/}</span>
+    <span class="strong-identifier">echo</span> <span class="identifier">${f%/*}</span>/retina/<span class="identifier">${wf##*/}</span> created
 
-    <strong>cwebp</strong> -resize 768 0 -q 85 -m 6 -mt -hint photo -quiet <var>$f</var> -o <var>${f%/*}</var>/thumb/<var>${wf##*/}</var>
-    <strong>echo</strong> <var>${f%/*}</var>/thumb/<var>${wf##*/}</var> created
+    <span class="strong-identifier">cwebp</span> -resize 768 0 -q 85 -m 6 -mt -hint photo -quiet <span class="identifier">$f</span> -o <span class="identifier">${f%/*}</span>/thumb/<span class="identifier">${wf##*/}</span>
+    <span class="strong-identifier">echo</span> <span class="identifier">${f%/*}</span>/thumb/<span class="identifier">${wf##*/}</span> created
 
-    <strong>./rm</strong> <var>$f</var>
-<b>done</b>
+    <span class="strong-identifier">./rm</span> <span class="identifier">$f</span>
+<span class="keyword">done</span>
 </code></pre>

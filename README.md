@@ -35,3 +35,6 @@ pub fn encode<E: Encoder>(source: &str, encoder: &mut E) -> Result<(), E::Error>
     encoder.write_html(processed)
 }
 ```
+
+The emitted HTML consists of span tags with the following class names: `glyph`, `literal`,
+`identifier`, `special-identifier`, `strong-identifier`, `keyword`, `comment`.
