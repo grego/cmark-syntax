@@ -6,7 +6,7 @@
 // along with cmark-syntax.  If not, see <http://www.gnu.org/licenses/>
 #![doc = include_str!("../README.md")]
 use logos::Logos;
-use pulldown_cmark::{CodeBlockKind, CowStr, Event, Tag};
+use pulldown_cmark::{CodeBlockKind, CowStr, Event, Tag, TagEnd};
 
 /// Definition of syntaxes of various languages.
 pub mod languages;
@@ -17,7 +17,7 @@ pub trait Highlight: Sized + for<'a> Logos<'a, Source = str> {
     const LANG: &'static str;
 
     /// The token denoting the start, before input.
-    const START: Self = Self::ERROR;
+    const START: Self;
 
     /// Determine the kind of a token from the current and the previous token.
     fn kind(tokens: &[Self; 2]) -> Kind;
@@ -112,7 +112,7 @@ impl<'a, I: Iterator<Item = Event<'a>>> Iterator for SyntaxPreprocessor<'a, I> {
                                 CowStr::Boxed(s.into())
                             }
                         }
-                        Some(Event::End(Tag::CodeBlock(_))) | None => break,
+                        Some(Event::End(TagEnd::CodeBlock)) | None => break,
                         Some(e) => {
                             return Some(Event::Text(
                                 format!("Unexpected markdown event {:#?}", e).into(),
@@ -122,7 +122,7 @@ impl<'a, I: Iterator<Item = Event<'a>>> Iterator for SyntaxPreprocessor<'a, I> {
                 }
                 code
             }
-            Some(Event::End(Tag::CodeBlock(_))) | None => CowStr::Borrowed(""),
+            Some(Event::End(TagEnd::CodeBlock)) | None => CowStr::Borrowed(""),
             Some(e) => {
                 return Some(Event::Text(
                     format!("Unexpected markdown event {:#?}", e).into(),
@@ -193,10 +193,10 @@ where
     let mut tokens = [Token::START; 2];
 
     while let Some(token) = lex.next() {
-        if tokens[1] != Token::ERROR {
+        if tokens[1] != Token::START {
             tokens[0] = tokens[1];
         }
-        tokens[1] = token;
+        tokens[1] = token.unwrap_or(Token::START);
 
         let kind = Token::kind(&tokens);
 

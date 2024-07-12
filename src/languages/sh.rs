@@ -3,9 +3,6 @@ use logos::Logos;
 
 #[derive(Logos, PartialEq, Eq, Clone, Copy, Debug)]
 pub enum Sh {
-    #[error]
-    Error,
-
     Start,
 
     #[regex(r"[^\s=$\(\)\{\}]*")]

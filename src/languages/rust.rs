@@ -3,9 +3,6 @@ use logos::Logos;
 
 #[derive(Logos, PartialEq, Eq, Clone, Copy, Debug)]
 pub enum Rust {
-    #[error]
-    Error,
-
     #[regex("[a-z_$][a-zA-Z0-9_]*!?")]
     #[regex("[A-Z_]*!?", priority = 3)]
     Identifier,
@@ -56,10 +53,13 @@ pub enum Rust {
     #[regex("//[^\n]*")]
     #[regex("/\\*([^/]|[^*]/)*\\*/")]
     Comment,
+
+    None,
 }
 
 impl Highlight for Rust {
     const LANG: &'static str = "rust";
+    const START: Self = Self::None;
 
     fn kind(tokens: &[Self; 2]) -> Kind {
         use Rust::*;

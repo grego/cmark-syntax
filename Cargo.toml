@@ -12,9 +12,9 @@ license = "GPL-3.0-or-later"
 readme = "README.md"
 
 [dependencies]
-pulldown-cmark = { version = "0.9", default_features = false }
-logos = "0.12"
+pulldown-cmark = { version = "0.10", default_features = false }
+logos = "0.14"
 latex2mathml = { version = "0.2.3", optional = true }
 
 [dev-dependencies]
-ramhorns = { git = "https://github.com/grego/ramhorns", branch = "shorthand" }
+ramhorns = "1"

@@ -3,9 +3,6 @@ use logos::Logos;
 
 #[derive(Logos, PartialEq, Eq, Clone, Copy, Debug)]
 pub enum JavaScript {
-    #[error]
-    Error,
-
     #[regex("[a-zA-Z_$][a-zA-Z0-9_]*")]
     Identifier,
 
@@ -18,7 +15,7 @@ pub enum JavaScript {
     #[regex("0[bB][01]+")]
     Literal,
 
-    #[regex(r#"\?|:|!|\^|-|\+|\*|&|/|\|<|>|=|=>|_"#)]
+    #[regex(r#"\?|:|!|\^|-|\+|\*|&|/|\|<|>|=|=>|_"#, priority = 3)]
     Glyph,
 
     #[regex(r"\.")]
@@ -40,10 +37,13 @@ pub enum JavaScript {
 
     #[regex("//[^\n]*")]
     Comment,
+
+    None,
 }
 
 impl Highlight for JavaScript {
     const LANG: &'static str = "js";
+    const START: Self = Self::None;
 
     fn kind(tokens: &[Self; 2]) -> Kind {
         use JavaScript::*;
