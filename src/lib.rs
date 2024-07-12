@@ -71,13 +71,6 @@ impl<'a, I: Iterator<Item = Event<'a>>> SyntaxPreprocessor<'a, I> {
     }
 }
 
-#[cfg(feature = "latex2mathml")]
-#[inline]
-fn is_inline_latex(s: &str) -> bool {
-    let s = s.as_bytes();
-    s.len() > 1 && [s[0], s[s.len() - 1]] == [b'$', b'$']
-}
-
 impl<'a, I: Iterator<Item = Event<'a>>> Iterator for SyntaxPreprocessor<'a, I> {
     type Item = Event<'a>;
 
@@ -86,11 +79,22 @@ impl<'a, I: Iterator<Item = Event<'a>>> Iterator for SyntaxPreprocessor<'a, I> {
         let lang = match self.parent.next()? {
             Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced(lang))) if !lang.is_empty() => lang,
             #[cfg(feature = "latex2mathml")]
-            Event::Code(c) if is_inline_latex(&c) => {
+            Event::InlineMath(c) => {
                 return Some(Event::Html(
                     latex2mathml::latex_to_mathml(
-                        &c[1..c.len() - 1],
+                        c.as_ref(),
                         latex2mathml::DisplayStyle::Inline,
+                    )
+                    .unwrap_or_else(|e| e.to_string())
+                    .into(),
+                ));
+            }
+            #[cfg(feature = "latex2mathml")]
+            Event::DisplayMath(c) => {
+                return Some(Event::Html(
+                    latex2mathml::latex_to_mathml(
+                        c.as_ref(),
+                        latex2mathml::DisplayStyle::Block,
                     )
                     .unwrap_or_else(|e| e.to_string())
                     .into(),
@@ -129,15 +133,6 @@ impl<'a, I: Iterator<Item = Event<'a>>> Iterator for SyntaxPreprocessor<'a, I> {
                 ))
             }
         };
-
-        #[cfg(feature = "latex2mathml")]
-        if lang.as_ref() == "math" {
-            return Some(Event::Html(
-                latex2mathml::latex_to_mathml(&code, latex2mathml::DisplayStyle::Block)
-                    .unwrap_or_else(|e| e.to_string())
-                    .into(),
-            ));
-        }
 
         let mut html = String::with_capacity(code.len() + code.len() / 4 + 60);
         html.push_str("<pre><code class=\"language-");
