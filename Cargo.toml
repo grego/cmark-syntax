@@ -1,8 +1,8 @@
 [package]
 name = "cmark-syntax"
-version = "0.5.1"
+version = "0.6.0"
 edition = "2021"
-authors = ["Maciej Hirsz <maciej.hirsz@pm.me>", "Maroš Grego <maros@grego.site>"]
+authors = ["Maroš Grego <maros@grego.site>", "Maciej Hirsz <maciej.hirsz@pm.me>"]
 description = "Syntax highlighting for pulldown-cmark"
 repository = "https://github.com/grego/cmark-syntax"
 homepage = "https://github.com/grego/cmark-syntax"
@@ -12,13 +12,13 @@ license = "GPL-3.0-or-later"
 readme = "README.md"
 
 [dependencies]
-pulldown-cmark = { version = "0.11", default_features = false }
-logos = "0.14"
+pulldown-cmark = { version = "0.12", default-features = false }
+logos = "0.15"
 latex2mathml = { version = "0.2.3", optional = true }
 
 [dev-dependencies]
 ramhorns = "1"
-pulldown-cmark = { version = "0.11", default_features = false, features = ["html"] }
+pulldown-cmark = { version = "0.12", default-features = false, features = ["html"] }
 
 [features]
 default = ["latex2mathml"]
