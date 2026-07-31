@@ -4,11 +4,13 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with cmark-syntax.  If not, see <http://www.gnu.org/licenses/>
+mod c;
 mod javascript;
 mod rust;
 mod sh;
 mod toml;
 
+pub use c::C;
 pub use javascript::JavaScript;
 pub use rust::Rust;
 pub use sh::Sh;

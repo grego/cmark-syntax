@@ -140,6 +140,7 @@ impl<'a, I: Iterator<Item = Event<'a>>> Iterator for SyntaxPreprocessor<'a, I> {
         html.push_str("\">");
 
         match lang.as_ref() {
+            "c" | "cpp" | "c++" => highlight::<languages::C>(&code, &mut html),
             "rust" | "rs" => highlight::<languages::Rust>(&code, &mut html),
             "js" | "javascript" => highlight::<languages::JavaScript>(&code, &mut html),
             "toml" => highlight::<languages::Toml>(&code, &mut html),
